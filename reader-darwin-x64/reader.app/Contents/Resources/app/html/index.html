@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>reader</title>
+    <!--
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+    -->
+    <link rel="stylesheet" href="./../css/styles.css">
+    <style>
+         @font-face{
+            font-family: "Roboto";
+            src: url("./../webfonts/Roboto/Roboto-Bold.ttf");
+        }
+        body{
+            -webkit-app-region:drag;
+            overflow-y:hidden;
+        }
+        #scroller {
+            display:table-cell;
+            font-family: 'Roboto';
+            font-size: 50px;
+            text-align:center;
+            vertical-align: middle;
+            weight:bold;
+            display: none;
+            margin: auto;
+            -webkit-user-select: none;
+            -webkit-app-region: drag;
+        }
+        .scroll-left{
+            display: table;
+            height: 100%;
+            width: 100%;
+            text-align: center;
+            /*border: 2px dashed #f69c55;
+            */
+        }
+
+        #open{
+            width:100%;
+            height:100%;
+            margin: 30px auto;
+            display: block;
+            -webkit-app-region: no-drag;
+            vertical-align: middle;
+        }
+</style>
+    
+    <script src="http://mozilla.github.io/pdf.js/build/pdf.js"></script>
+    <!--    
+    <script src='./../js/pdf.js/build/pdf.js'></script>
+    -->
+    
+</head>
+<body>
+<button id='open' >open pdf file</button>
+<div class="container-fluid">
+    
+    <marquee id=scroller scrollamount=35 ></marquee>
+</div>
+<input type="file" id="pdfFilePicker" style = 'visibility:hidden' name ="pdfFilePicker" onclick="readFolder();"/>
+<script src="./../renderer/renderer.js"></script>
+<script type="text/javascript">
+    
+    var text 
+    var element = document.getElementById('scroller')
+    element.stop();
+    var i = 0
+    var changed = false
+    var pause = false
+    var currentSpeed = 35
+    var fileSelected = false;
+    setInterval(function(){
+        document.body.onkeydown=function(e){
+            if(e.keyCode ==32){
+                if(pause==true){
+                    pause=false
+                    changed = true
+                }
+                else{
+                    pause=true
+                    changed = true
+                }
+            }
+            else if(e.keyCode ==38){
+                currentSpeed++
+                element.setAttribute('scrollAmount',currentSpeed,0)
+            }
+            else if(e.keyCode ==40){
+                currentSpeed--
+                element.setAttribute('scrollAmount',currentSpeed,0)
+            }
+            else if(e.keyCode ==37){
+                
+                element.setAttribute('scrollAmount',-30,0)
+            }
+            else if(e.keyCode ==37){
+                element.setAttribute('scrollAmount',currentSpeed*2,0)
+            }
+        }
+        document.body.onkeyup=function(e){
+            element.style.scrollAmount=currentSpeed
+        }
+        /*
+        document.body.ondblclick=function(){
+            element.innerText = ''
+            readFolder()
+            
+        }
+        */
+        var button = document.getElementById('open')
+        button.onclick=()=>{
+            element.style.display='block'
+            //readFolder()
+            document.getElementById('pdfFilePicker').click();
+            button.style.display='none'
+        }
+        /*
+        document.body.onclick=function(){
+            
+            if(pause==true){
+                    pause=false
+                    changed = true
+                }
+            else{
+                    pause=true
+                    changed =true
+                }
+        }
+        */
+        if(changed==true)
+        {
+            if(pause==true){
+                element.stop()
+            }
+            else{
+                element.start()
+            } 
+            changed=false
+        }
+         
+
+    },250) 
+
+</script>
+</body>
+</html>

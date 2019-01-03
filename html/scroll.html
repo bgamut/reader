@@ -1,0 +1,74 @@
+<link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+<div class="scroll-left">
+        <marquee id=scroller scrollamount=35>something </marquee>
+</div>
+    
+<style>
+        #scroller {
+            display:table-cell;
+            font-family: 'Roboto';
+            font-size: 50px;
+            text-align:center;
+            vertical-align: middle;
+            weight:bold;
+            visibility:hidden;
+        }
+        .scroll-left{
+            display: table;
+            height: 100%;
+            width: 100%;
+            text-align: center;
+            /*border: 2px dashed #f69c55;
+            */
+        }
+</style>
+<script type="text/javascript">
+    var text ={{ text|safe }}
+    example=["0","1","2"]
+    //console.log(text)
+    //console.log(text.length)
+
+    var i = 0
+    var changed = false
+    var pause = false
+    setInterval(function(){
+        
+            document.body.onkeydown=function(e){
+                if(e.keyCode ==32){
+                    if(pause==true){
+                        pause=false
+                        changed = true
+                    }
+                    else{
+                        pause=true
+                        changed = true
+                    }
+                }
+            }
+            document.body.onclick=function(){
+                if(pause==true){
+                        pause=false
+                        changed = true
+                    }
+                else{
+                        pause=true
+                        changed =true
+                    }
+            }
+            if(changed==true)
+            {
+                if(pause==true){
+                    document.getElementById('scroller').stop()
+                }
+                else{
+                    document.getElementById('scroller').start()
+                } 
+                changed=false
+            }
+                
+
+    },150)
+
+
+</script>

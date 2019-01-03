@@ -1,0 +1,25 @@
+I am starting to use 
+webpack.js.org
+the webpack.js is a result of using web pack after providing 
+webpack.config.js 
+
+from 
+
+webpack.js.org 
+
+and example from 
+
+http://www.matthiassommer.it/software-architecture/webpack-node-modules/
+(the example is flawed in a sense that it adds unnecessary quotation marks btw)
+
+and adding
+
+mode:'development'
+
+and then running 
+
+webpack 
+
+in this directory location which creates webpack.js in
+
+./node_modules/webpack/bin
