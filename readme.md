@@ -1,3 +1,3 @@
-With npm installed, just run the run_packager.sh in from this folder by cding into it
+install npm
 cd Downloads/reader-master
 bash run_packager.sh
