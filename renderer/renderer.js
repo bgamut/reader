@@ -12,7 +12,7 @@ var {ipcRenderer,ipcMain,remote} = require('electron')
 var { remote } = require ('electron')
 var dialog = remote.dialog
 var {BrowserWindow} = remote
-
+var Jimp = require('jimp')
 //var filePath = undefined;
 //var pdfText=require('pdf-text')
 //var pdfjsLib = require('./../js/pdf.js/build/pdf.js')
@@ -398,7 +398,7 @@ function readFolder(){
                             var container = document.getElementById('canvas-container')
                             var canvases = container.children
                             for (var i=0; i<canvases.length; i++){
-                                var saveimgname = +i+'.png'
+                                var saveimgname = i+'.png'
                                 var saveimgpath = 'temp/png/'+ saveimgname
                                 var canvas = canvases[i]
                                 var dataUrl = canvas.toDataURL('image/png')
@@ -411,6 +411,19 @@ function readFolder(){
                                 })
                             }
                             
+                        }).then(function(){
+                            var container = document.getElementById('canvas-container')
+                            var canvases = container.children
+                            for (var i=0; i<canvases.length; i++){
+                                var savedimgname = i+'.png'
+                                var savedimgpath = 'temp/png/'+ saveimgname
+                                var newimgname = i+'.jpeg'
+                                var newimgpath = 'temp/jpeg/'+newimgname
+                                Jimp.read(savedimgpath,(err,data)=>{
+                                    data.write(newimgpath)
+                                })
+                                
+                            }
                         })
                     })   
                 })
