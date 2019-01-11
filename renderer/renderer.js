@@ -321,6 +321,8 @@ function readFolder(){
                         */
                         
                         //var dataUrl=canvas.toDataURL("image/png").replace("image/png", "image/octet-stream");
+                        
+                        //https://stackoverflow.com/questions/6926016/nodejs-saving-a-base64-encoded-image-to-disk
                         var dataUrl = canvas.toDataURL('image/png')
                         var base64=dataUrl.replace(/^data:image\/png;base64,/,"")
                         console.log(base64)
