@@ -21,6 +21,6 @@ var runningman = spawn('tesseract',args,{stdio:'ignore'})
 var englishtext = fs.readFileSync('/Users/bernardahn/Desktop/development/software/webapp/reader/temp/tesseractTest.txt','ascii')
 var koreantext = fs.readFileSync('/Users/bernardahn/Desktop/development/software/webapp/reader/temp/tesseractTest.txt','utf8')
 */
-var englishtext = fs.readFileSync(__dirname+'/temp/tesseractTest.txt','ascii')
+var englishtext = fs.readFileSync(__dirname+'/temp/tesseractTest.txt','utf8')
 var koreantext = fs.readFileSync(__dirname+'/temp/tesseractTest.txt','utf8')
 console.log(englishtext)
