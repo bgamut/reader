@@ -282,7 +282,11 @@ function readFolder(){
                 
                 loadingTask.promise.then((pdfDocument)=>{
                 pdfDocument.getPage(currentPage).then(function(page){
-                    var canvas = document.getElementById("pdf-canvas")
+                    //var canvas = document.getElementById("pdf-canvas")
+                    var container = document.getElementById('canvas-container')
+                    var canvas = document.createElement("canvas")
+                    canvas.setAttribute('id',page)
+                    
                     //var canvas = document.createElement('canvas')
                     var canvasctx = canvas.getContext('2d')
                     //canvas.setAttribute('width',100)
@@ -290,6 +294,7 @@ function readFolder(){
                     
                     //var viewport = page.getViewport(scale_required);
                     canvas.setAttribute('width',page.getViewport(1).width)
+                    container.appendChild(canvas)
                     var viewport = page.getViewport(1)
                     canvas.height = viewport.height;
                     var renderContext = {
@@ -297,8 +302,7 @@ function readFolder(){
                         viewport:viewport
                     };
                     //saveimgpath=parentDir+'/'+currentPage+'.png'
-                    saveimgname = +currentPage+'.png'
-                    saveimgpath = 'temp/'+ saveimgname
+                    
                     page.render(renderContext).then(function(){
                         //
                         //console.log(canvas.toDataURL())
@@ -321,7 +325,7 @@ function readFolder(){
                         */
                         
                         //var dataUrl=canvas.toDataURL("image/png").replace("image/png", "image/octet-stream");
-                        
+                        /*
                         //https://stackoverflow.com/questions/6926016/nodejs-saving-a-base64-encoded-image-to-disk
                         var dataUrl = canvas.toDataURL('image/png')
                         var base64=dataUrl.replace(/^data:image\/png;base64,/,"")
@@ -331,6 +335,7 @@ function readFolder(){
                                 throw err
                             }
                         })
+                        */
                         //window.location.href=dataUrl;
                         //var base64=dataUrl.split(',')[1]
                         //var mime = dataUrl[0].match(/:(.*?);/)[1]
@@ -388,6 +393,24 @@ function readFolder(){
                                 scroller.innerHTML = text;
                                 scroller.start()
                             }
+                        }).then(function(){
+                            //https://stackoverflow.com/questions/6926016/nodejs-saving-a-base64-encoded-image-to-disk
+                            var container = document.getElementById('canvas-container')
+                            var canvases = container.children
+                            for (var i=0; i<canvases.length; i++){
+                                var saveimgname = +i+'.png'
+                                var saveimgpath = 'temp/png/'+ saveimgname
+                                var canvas = canvases[i]
+                                var dataUrl = canvas.toDataURL('image/png')
+                                var base64=dataUrl.replace(/^data:image\/png;base64,/,"")
+                                console.log(base64)
+                                fs.writeFile(saveimgpath,base64,'base64',function(err){
+                                    if(err){
+                                        throw err
+                                    }
+                                })
+                            }
+                            
                         })
                     })   
                 })

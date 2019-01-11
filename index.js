@@ -1,8 +1,10 @@
 var path = require('path')
+/*
 require('electron-reload')(__dirname,{
     electron: path.join(__dirname, 'node_modules', '','electron'),
     hardResetMethod:'exit'
   });
+*/
 const {app, BrowserWindow, Menu, MenuItem,ipcMain,ipcRenderer,remote, webContents} = require('electron');
 PDFParser = require('pdf2json')
 /*

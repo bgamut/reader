@@ -21,6 +21,8 @@
     "is-buffer": "^2.0.3",
     "is-descriptor": "^3.0.0",
     "lodash": "^4.17.11",
+    "ng-ocr": "^1.6.1",
+    "node-tesseract": "^0.2.7",
     "pcm": "^1.0.3",
     "pdf-image": "^2.0.0",
     "pdf-parse": "^1.1.1",
