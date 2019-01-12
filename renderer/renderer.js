@@ -188,15 +188,16 @@ function readFolder(){
         var parentDir = path.dirname(filepath);
         var basename = path.basename(parentDir)
         var saveimgpath = ''
-        console.log(filepath)
+        //console.log(filepath)
         if(filepath!==undefined){
             //pdfjsLib.GlobalWorkerOptions.workerSrc ='http://mozilla.github.io/pdf.js/build/pdf.worker.js';
             pdfjsLib.GlobalWorkerOptions.workerSrc ='./../js/pdfjs/build/pdf.worker.js';
             var rawData = new Uint8Array(fs.readFileSync(filepath))
-            console.log(rawData)
+            //console.log(rawData)
             var loadingTask=pdfjsLib.getDocument(rawData)
             var numpages=0;
             var scroller = document.getElementById('scroller')
+            
             function dataURItoBlob(dataURI) {
                 // convert base64/URLEncoded data component to raw binary data held in a string
                 var byteString;
@@ -252,7 +253,9 @@ function readFolder(){
                    return new Promise(
                        (resolve, reject) => {
                             fileReader.readAsArrayBuffer(blob,(error,result)=>{
-                                if (error) reject(error);
+                                if (error) {
+                                    reject(error)
+                                }
                                 var returnValue=result
                                 resolve(returnValue)
                             })
@@ -278,6 +281,24 @@ function readFolder(){
                 return theBlob;
             }    
             */     
+           var writePNG=function (saveimgpath,base64,pagenumber){
+                return new Promise(
+                    function(resolve, reject){
+                        var saveimgname = pagenumber+'.png'
+                        var saveimgpath = 'temp/png/'+ saveimgname
+                        var newimgname = pagenumber+'.jpeg'
+                        var newimgpath = 'temp/jpeg/'+newimgname
+                        fs.writeFile(saveimgpath,base64,'base64',function (err){
+                            if (err) {
+                                reject(err)
+                            }
+                            else{
+                                resolve(pagenumber)
+                            } 
+                        })
+                    }
+                )
+            }
             var readit = function(currentPage){
                 
                 loadingTask.promise.then((pdfDocument)=>{
@@ -301,9 +322,28 @@ function readFolder(){
                         canvasContext: canvasctx,
                         viewport:viewport
                     };
-                    //saveimgpath=parentDir+'/'+currentPage+'.png'
+                    saveimgpath=parentDir+'/'+currentPage+'.png'
+                    
                     
                     page.render(renderContext).then(function(){
+                        var container = document.getElementById('canvas-container')
+                        var dataUrl = container.children[currentPage-1].toDataURL('image/png')
+                        var base64=dataUrl.replace(/^data:image\/png;base64,/,"")
+                        var currentPageNum = currentPage
+                        //console.log(currentPageNum)
+                        //console.log(base64)
+                        writePNG(saveimgpath,base64,currentPageNum).then(
+                            function(){
+                                var savedimgpath = 'temp/png/'+currentPageNum+'.png'
+                                //console.log(savedimgpath)
+                                var newimgname = currentPageNum+'.jpeg'
+                                var newimgpath = 'temp/jpeg/'+newimgname
+                                Jimp.read(savedimgpath,(err,data)=>{
+                                    data.write(newimgpath)
+                                })
+                            }
+                        )
+                        
                         //
                         //console.log(canvas.toDataURL())
                         //console.log(saveimgpath)
@@ -376,8 +416,7 @@ function readFolder(){
                             console.log(saveimgpath)
                         })
                         */
-                    })
-                    page.getTextContent().then(function(textContent){
+                       page.getTextContent().then(function(textContent){
                         
                         //console.log('number '+currentPage)
                             for(var i =0; i<textContent.items.length; i++){
@@ -393,7 +432,11 @@ function readFolder(){
                                 scroller.innerHTML = text;
                                 scroller.start()
                             }
-                        }).then(function(){
+                        })
+                    })
+                    
+                        /*
+                        .then(function(){
                             //https://stackoverflow.com/questions/6926016/nodejs-saving-a-base64-encoded-image-to-disk
                             var container = document.getElementById('canvas-container')
                             var canvases = container.children
@@ -403,20 +446,43 @@ function readFolder(){
                                 var canvas = canvases[i]
                                 var dataUrl = canvas.toDataURL('image/png')
                                 var base64=dataUrl.replace(/^data:image\/png;base64,/,"")
-                                console.log(base64)
+                                //console.log(base64)
+                                /*
                                 fs.writeFile(saveimgpath,base64,'base64',function(err){
                                     if(err){
                                         throw err
                                     }
+                                    var newimgname = i+'.jpeg'
+                                    var newimgpath = 'temp/jpeg/'+newimgname
+                                    Jimp.read(saveimgpath,(err,data)=>{
+                                        data.write(newimgpath)
+                                    })
+                                })
+                                */
+                                
+                        /*
+                                 writePNG(saveimgpath,base64,i)
+                                 .then(function(i){
+                                     console.log(i)
+                                    var savedimgname = i+'.png'
+                                    var savedimgpath = 'temp/png/'+ savedimgname
+                                    var newimgname = i+'.jpeg'
+                                    var newimgpath = 'temp/jpeg/'+newimgname
+                                    Jimp.read(savedimgpath,(err,data)=>{
+                                        data.write(newimgpath)
+                                    })
                                 })
                             }
                             
-                        }).then(function(){
+                        })
+                        */
+                        /*
+                        .then(function(){
                             var container = document.getElementById('canvas-container')
                             var canvases = container.children
                             for (var i=0; i<canvases.length; i++){
                                 var savedimgname = i+'.png'
-                                var savedimgpath = 'temp/png/'+ saveimgname
+                                var savedimgpath = 'temp/png/'+ savedimgname
                                 var newimgname = i+'.jpeg'
                                 var newimgpath = 'temp/jpeg/'+newimgname
                                 Jimp.read(savedimgpath,(err,data)=>{
@@ -425,6 +491,7 @@ function readFolder(){
                                 
                             }
                         })
+                        */
                     })   
                 })
                 
@@ -432,8 +499,12 @@ function readFolder(){
             loadingTask.promise.then((pdfDocument)=>{
                 console.log(pdfDocument._pdfInfo['numPages'])
                 numpages = pdfDocument._pdfInfo['numPages']
-            }).then(readit(1)) 
-               
+            })
+            .then(
+                function(){
+                    readit(1);
+                }      
+            )      
         }
         else{
             document.getElementById('readFile').click()

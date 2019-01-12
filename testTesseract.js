@@ -2,14 +2,20 @@ var fs = require('fs')
 var spawn =require('child_process').spawn
 
 
-var inputPath = '/Users/bernardahn/Desktop/development/software/webapp/reader/temp/jpeg/jimptest.jpg'
-var language = 'ENG'
+//var inputPath = '/Users/bernardahn/Desktop/development/software/webapp/reader/temp/jpeg/jimptest.jpg'
+//var language = 'ENG'
+var inputPath = process.argv[2]
+var language = process.argv[3]
+if(language == undefined){
+    language='KOR'
+    //language='ENG'
+}
 /*
 var inputPath = '/Users/bernardahn/Desktop/development/software/webapp/reader/temp/jpeg/3.jpeg'
 var language = 'KOR'
 */
 //below is a txt file path minus the file extension
-var outputPath = '/Users/bernardahn/Desktop/development/software/webapp/reader/temp/tesseractTest'
+var outputPath = __dirname+'/temp/tesseractTest'
 
 var args = [
     inputPath,
