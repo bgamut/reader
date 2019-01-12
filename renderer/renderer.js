@@ -365,7 +365,11 @@ function readFolder(){
                             }
                             */
                             function(pageNum){
-                                PNGtoJPEG(pageNum)
+                                PNGtoJPEG(pageNum).then(function(pageNow){
+                                    var readFrom = __dirname+'./../temp/jpeg/'+pageNow+'.jpeg'
+                                    var serverProc = require('child_process').fork(
+                                    require.resolve('./../testTesseract.js'),[readFrom,'KOR',pageNow])
+                                })
                             }
                            
                         )

@@ -6,6 +6,9 @@ var spawn =require('child_process').spawn
 //var language = 'ENG'
 var inputPath = process.argv[2]
 var language = process.argv[3]
+var currentPage = process.argv[4]
+console.log(inputPath)
+console.log(language)
 if(language == undefined){
     language='KOR'
     //language='ENG'
@@ -15,7 +18,7 @@ var inputPath = '/Users/bernardahn/Desktop/development/software/webapp/reader/te
 var language = 'KOR'
 */
 //below is a txt file path minus the file extension
-var outputPath = __dirname+'/temp/tesseractTest'
+var outputPath = __dirname+'/temp/txt/'+currentPage
 
 var args = [
     inputPath,
