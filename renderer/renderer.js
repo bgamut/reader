@@ -366,9 +366,10 @@ function readFolder(){
                             */
                             function(pageNum){
                                 PNGtoJPEG(pageNum).then(function(pageNow){
-                                    var readFrom = __dirname+'./../temp/jpeg/'+pageNow+'.jpeg'
+                                    var readFrom = __dirname+'/./../temp/jpeg/'+pageNow+'.jpeg'
                                     var serverProc = require('child_process').fork(
-                                    require.resolve('./../testTesseract.js'),[readFrom,'KOR',pageNow])
+                                    //require.resolve('./../testTesseract.js'),[readFrom,'KOR',pageNow])
+                                    require.resolve('./../js/tesseract.js'),[readFrom,'KOR',pageNow])
                                     serverProc.on('exit', (code, sig) => {
                                         // finishing
                                         console.log('exiting '+pageNow)
