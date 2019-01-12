@@ -285,7 +285,10 @@ function readFolder(){
                 return new Promise(
                     function(resolve, reject){
                         var saveimgname = pagenumber+'.png'
+                        
+                        //var saveimgpath = '/Users/bernardahn/Desktop/temp/png/' +saveimgname
                         var saveimgpath = 'temp/png/'+ saveimgname
+
                         var newimgname = pagenumber+'.jpeg'
                         var newimgpath = 'temp/jpeg/'+newimgname
                         fs.writeFile(saveimgpath,base64,'base64',function (err){
@@ -303,8 +306,11 @@ function readFolder(){
                 return new Promise(
                     function(resolve,reject){
                         var savedimgpath = 'temp/png/'+currentPageNum+'.png'
+                        //var savedimgpath = '/Users/bernardahn/Desktop/temp/png/'+currentPageNum+'.png'
                         //console.log(savedimgpath)
                         var newimgname = currentPageNum+'.jpeg'
+
+                        //var newimgpath = '/Users/bernardahn/Desktop/temp/jpeg/'+newimgname
                         var newimgpath = 'temp/jpeg/'+newimgname
                         Jimp.read(savedimgpath,(err,data)=>{
                             if(err){
@@ -314,6 +320,25 @@ function readFolder(){
                                 data.write(newimgpath)
                                 resolve(currentPageNum)
                             }
+                        })
+                    }
+                )
+            }
+            var writeCustomBash=function(currentPageNum){
+                return new Promise(
+                    function(resolve,reject){
+                        var jpegpath = '/Users/bernardahn/Desktop/temp/jpeg/'+currentPageNum+'.jpeg'
+                        var parttextpath = '/Users/bernardahn/Desktop/temp/txt/'+currentPageNum
+                        var fullbashpath = '/Users/bernardahn/Desktop/temp/bash/'+currentPageNum+'.bash'
+                        var language = 'ENG'
+                        var string = 'tesseract '+jpegpath+' '+parttextpath+ ' -l '+language
+                        fs.writeFile(fullbashpath,string,function (err){
+                            if (err) {
+                                reject(err)
+                            }
+                            else{
+                                resolve(fulltextpath)
+                            } 
                         })
                     }
                 )
@@ -367,17 +392,44 @@ function readFolder(){
                             function(pageNum){
                                 PNGtoJPEG(pageNum).then(function(pageNow){
                                     var readFrom = __dirname+'/./../temp/jpeg/'+pageNow+'.jpeg'
+                                    //var readFrom = '/Users/bernardahn/Desktop/temp/jpeg/'+pageNow+'.jpeg'
+                                    
                                     var serverProc = require('child_process').fork(
                                     //require.resolve('./../testTesseract.js'),[readFrom,'KOR',pageNow])
-                                    require.resolve('./../js/tesseract.js'),[readFrom,'KOR',pageNow])
-                                    serverProc.on('exit', (code, sig) => {
+                                    //require.resolve('./../js/tesseract.js'),[readFrom,'KOR',pageNow])
+                                    require.resolve('./../js/tesseract.js'),[readFrom,'ENG',pageNow])
+                                    //require.resolve('/Users/bernardahn/Desktop/development/software/webapp/reader/js/tesseract.js'),[readFrom,'ENG',pageNow])
+                                   serverProc.on('exit', (code, sig) => {
                                         // finishing
                                         console.log('exiting '+pageNow)
+                                        var text = fs.readFileSync(path.join(__dirname,'/../','temp/txt/'+currentPage+'.txt'),'utf8')
+                                        console.log(text)
                                     })
                                       serverProc.on('error', (error) => {
                                         console.error(error)
                                         // error handling
                                     })
+                                    
+                                   /*
+                                    var spawn =require('child_process').spawn
+                                    var inputPath =readFrom
+                                    var outputPath = '/Users/bernardahn/Desktop/temp/txt/'+currentPage
+                                    //var language = 'KOR'
+                                    var language = 'ENG'
+                                    var args = [
+                                        inputPath,
+                                        outputPath,
+                                        '-l',language
+                                    ]
+                                    //spawn doesn't work when file is consolidated
+                                    //spawn('tesseract',args,{stdio:'ignore'})
+                                    //var runningman = spawn('tesseract',args,{stdio:'ignore'})
+                                    
+                                    writeCustomBash(pageNow).then(function(bashpath){
+                                        shell.openItem(bashpath)
+                                    })
+                                    */
+                                    
 
                                 })
                             }

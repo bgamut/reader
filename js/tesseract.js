@@ -1,4 +1,5 @@
 var fs = require('fs')
+var path = require('path')
 var spawn =require('child_process').spawn
 
 var inputPath = process.argv[2]
@@ -10,7 +11,7 @@ if(language == undefined){
 }
 
 var outputPath = __dirname+'/./../temp/txt/'+currentPage
-
+//var outputPath = '/Users/bernardahn/Desktop/txt/'+currentPage
 var args = [
     inputPath,
     outputPath,
@@ -21,5 +22,3 @@ var runningman = spawn('tesseract',args,{stdio:'ignore'})
 var englishtext = fs.readFileSync('/Users/bernardahn/Desktop/development/software/webapp/reader/temp/tesseractTest.txt','ascii')
 var koreantext = fs.readFileSync('/Users/bernardahn/Desktop/development/software/webapp/reader/temp/tesseractTest.txt','utf8')
 */
-var text = fs.readFileSync(__dirname+'/./../temp/txt/'+currentPage+'.txt','utf8')
-console.log(text)
