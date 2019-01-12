@@ -299,6 +299,25 @@ function readFolder(){
                     }
                 )
             }
+            var PNGtoJPEG = function(currentPageNum){
+                return new Promise(
+                    function(resolve,reject){
+                        var savedimgpath = 'temp/png/'+currentPageNum+'.png'
+                        //console.log(savedimgpath)
+                        var newimgname = currentPageNum+'.jpeg'
+                        var newimgpath = 'temp/jpeg/'+newimgname
+                        Jimp.read(savedimgpath,(err,data)=>{
+                            if(err){
+                                reject(err)
+                            }
+                            else{
+                                data.write(newimgpath)
+                                resolve(currentPageNum)
+                            }
+                        })
+                    }
+                )
+            }
             var readit = function(currentPage){
                 
                 loadingTask.promise.then((pdfDocument)=>{
@@ -333,6 +352,8 @@ function readFolder(){
                         //console.log(currentPageNum)
                         //console.log(base64)
                         writePNG(saveimgpath,base64,currentPageNum).then(
+                            
+                            /*
                             function(){
                                 var savedimgpath = 'temp/png/'+currentPageNum+'.png'
                                 //console.log(savedimgpath)
@@ -342,6 +363,11 @@ function readFolder(){
                                     data.write(newimgpath)
                                 })
                             }
+                            */
+                            function(pageNum){
+                                PNGtoJPEG(pageNum)
+                            }
+                           
                         )
                         
                         //
