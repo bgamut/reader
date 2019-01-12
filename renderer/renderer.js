@@ -369,6 +369,15 @@ function readFolder(){
                                     var readFrom = __dirname+'./../temp/jpeg/'+pageNow+'.jpeg'
                                     var serverProc = require('child_process').fork(
                                     require.resolve('./../testTesseract.js'),[readFrom,'KOR',pageNow])
+                                    serverProc.on('exit', (code, sig) => {
+                                        // finishing
+                                        console.log('exiting '+pageNow)
+                                    })
+                                      serverProc.on('error', (error) => {
+                                        console.error(error)
+                                        // error handling
+                                    })
+
                                 })
                             }
                            
