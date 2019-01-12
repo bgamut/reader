@@ -332,6 +332,7 @@ function readFolder(){
                         var fullbashpath = '/Users/bernardahn/Desktop/temp/bash/'+currentPageNum+'.bash'
                         var language = 'ENG'
                         var string = 'tesseract '+jpegpath+' '+parttextpath+ ' -l '+language
+                    
                         fs.writeFile(fullbashpath,string,function (err){
                             if (err) {
                                 reject(err)
@@ -392,18 +393,25 @@ function readFolder(){
                             function(pageNum){
                                 PNGtoJPEG(pageNum).then(function(pageNow){
                                     var readFrom = __dirname+'/./../temp/jpeg/'+pageNow+'.jpeg'
+                                    
                                     //var readFrom = '/Users/bernardahn/Desktop/temp/jpeg/'+pageNow+'.jpeg'
                                     
                                     var serverProc = require('child_process').fork(
                                     //require.resolve('./../testTesseract.js'),[readFrom,'KOR',pageNow])
-                                    //require.resolve('./../js/tesseract.js'),[readFrom,'KOR',pageNow])
-                                    require.resolve('./../js/tesseract.js'),[readFrom,'ENG',pageNow])
+                                    require.resolve('./../js/tesseract.js'),[readFrom,'KOR',pageNow])
+                                    //require.resolve('./../js/tesseract.js'),[readFrom,'ENG',pageNow])
                                     //require.resolve('/Users/bernardahn/Desktop/development/software/webapp/reader/js/tesseract.js'),[readFrom,'ENG',pageNow])
-                                   serverProc.on('exit', (code, sig) => {
+                                    serverProc.on('exit', (code, sig) => {
                                         // finishing
                                         console.log('exiting '+pageNow)
                                         var text = fs.readFileSync(path.join(__dirname,'/../','temp/txt/'+currentPage+'.txt'),'utf8')
-                                        console.log(text)
+                                        var newText = text.replace(/(\r\n\t|\n|\r\t)/gm, "");
+                                        fs.writeFile(path.join(__dirname,'/../','temp/newtxt/'+currentPage+'.txt'),newText,function(err,data){
+                                            if(err){
+                                                console.error(error)
+                                            }
+                                        })
+                                        console.log(newText)
                                     })
                                       serverProc.on('error', (error) => {
                                         console.error(error)
@@ -429,8 +437,35 @@ function readFolder(){
                                         shell.openItem(bashpath)
                                     })
                                     */
-                                    
 
+                                   /*
+                                   var eto = require('easy-tesseract-ocr')
+                                   var t
+                                   //var language = 'kor'
+                                   var language = 'eng'
+                                   var scan = function(){
+                                       return new Promise(
+                                           function(resolve, reject){
+                                               eto.scan({imagePath:'/Users/bernardahn/Desktop/3.jpeg',trainedData:language}).then(function(data,error){
+                                                   if (error) {
+                                                       reject(error)
+                                                   }
+                                                   else{
+                                                       resolve(data)
+                                                   } 
+                                               })    
+                                           }
+                                       )
+                                   }
+                                   var updated = function(){
+                                       scan().then(function(data){
+                                           data
+                                           console.log(data)  
+                                           fs.writeFile(path.join(__dirname,'/../','temp/txt/'+currentPage+'.txt'),data,'utf8')      
+                                       })
+                                   }
+                                   */
+                                  
                                 })
                             }
                            
