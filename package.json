@@ -10,6 +10,7 @@
   "license": "ISC",
   "dependencies": {
     "async": "^2.6.1",
+    "easy-tesseract-ocr": "^1.2.2",
     "electron": "^4.0.0",
     "electron-fs-extra": "^1.0.0",
     "electron-log": "^2.2.17",
@@ -17,6 +18,7 @@
     "electron-patch-fs": "^1.0.3",
     "electron-reload": "^1.4.0",
     "fs-extra": "^7.0.1",
+    "ignore-warnings": "^0.2.1",
     "imagemagick": "^0.1.3",
     "is-buffer": "^2.0.3",
     "is-descriptor": "^3.0.0",
@@ -25,6 +27,7 @@
     "locate-path": "^3.0.0",
     "lodash": "^4.17.11",
     "ng-ocr": "^1.6.1",
+    "nocr": "^1.2.0",
     "node-tesseract": "^0.2.7",
     "optimist": "^0.6.1",
     "pcm": "^1.0.3",
@@ -40,6 +43,7 @@
     "pdfreader": "^0.2.5",
     "rimraf": "^2.6.3",
     "stream": "0.0.2",
+    "tesseract.js": "^1.0.14",
     "underscore": "^1.9.1",
     "util": "^0.11.1"
   }
