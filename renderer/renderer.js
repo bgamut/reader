@@ -116,7 +116,9 @@ var getPath = function(pathString){
         }
     })         
 }
-var text = '                          '
+var numpages = 0;
+var numerator = 0;
+var text = ' '
 /*
 function readFolder(){
     dialog.showOpenDialog({message:'Choose Your PDF File',filters:[{name:'PDFs',extensions:['pdf']}],properties:['openFile','createDirectory','promptToCreate']},(pathlist)=>{
@@ -176,7 +178,9 @@ function readFolder(){
     })
 }
 */
-
+function sortNumber(a,b){
+    files[1].split('.')[0]-files[2].split('.')[0]
+}
 function readFolder(){
     
     //var canvas = document.getElementById("pdf-canvas")
@@ -195,7 +199,7 @@ function readFolder(){
             var rawData = new Uint8Array(fs.readFileSync(filepath))
             //console.log(rawData)
             var loadingTask=pdfjsLib.getDocument(rawData)
-            var numpages=0;
+            
             var scroller = document.getElementById('scroller')
             
             function dataURItoBlob(dataURI) {
@@ -405,12 +409,34 @@ function readFolder(){
                                         // finishing
                                         console.log('exiting '+pageNow)
                                         var text = fs.readFileSync(path.join(__dirname,'/../','temp/txt/'+currentPage+'.txt'),'utf8')
-                                        var newText = text.replace(/(\r\n\t|\n|\r\t)/gm, "");
+                                        var newText = text.replace(/(\r\n\t|\n|\r\t|\t|\f|;|\|\/|<|>|'|'|:|_|]'+'|'*'|ㅠ|ㅎ|ㅋ)/gm,"").replace(/\s\s+/g," ").replace(/[\/|\\]/g,"");
                                         fs.writeFile(path.join(__dirname,'/../','temp/newtxt/'+currentPage+'.txt'),newText,function(err,data){
                                             if(err){
                                                 console.error(error)
                                             }
+                                            else(
+                                                numerator+=1
+                                            )
                                         })
+                                        console.log(numerator + " / " +numpages)
+                                        if(numerator==numpages){
+                                           var files= fs.readdirSync(path.join(__dirname,'/../','temp/newtxt/'))
+                                           files = files.sort(sortNumber)
+                                           var text = ""
+                                           for (var i = 0; i<=files.length; i++){
+                                               if(files[i].split('.')[1]=='txt'){
+                                                   text +=" "+fs.readFileSync(path.join(__dirname,'/../','temp/txt/'+i+'.txt'),'utf8')
+                                               }
+                                           }
+                                           fs.writeFile(path.join(__dirname,'/../','temp/newtxt/alltext.txt'),text,function(err,data){
+                                            if(err){
+                                                console.error(error)
+                                            }
+                                            else(
+                                                console.log('alltext.txt is ready')
+                                            )
+                                        })
+                                        }
                                         console.log(newText)
                                     })
                                       serverProc.on('error', (error) => {
