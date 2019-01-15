@@ -244,9 +244,9 @@ function readFolder(){
         if(filepath!==undefined){
             var buttonContainer = document.getElementById('button-container')
             buttonContainer.style.display='none'
-            document.body.setAttribute('style','background-color:rgb(30,30,30);')
-            document.getElementById('log-container').setAttribute('style','display:block')
-            window.scrollTo(0,document.body.scrollHeight);
+            document.body.setAttribute('style','background-color:rgb(30,30,30);display:block')
+            console.log('loading')
+            document.getElementById('log-container').scrollTo(0,document.getElementById('log-container').scrollHeight)
             //pdfjsLib.GlobalWorkerOptions.workerSrc ='http://mozilla.github.io/pdf.js/build/pdf.worker.js';
             pdfjsLib.GlobalWorkerOptions.workerSrc ='./../js/pdfjs/build/pdf.worker.js';
             var rawData = new Uint8Array(fs.readFileSync(filepath))
