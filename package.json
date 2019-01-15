@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "electron .",
-    "rebuild":"npm rebuild --runtime=electron --target=4.0.0 --disturl=https://atom.io/download/atom-shell --abi=48"
+    "rebuild": "npm rebuild --runtime=electron --target=4.0.0 --disturl=https://atom.io/download/atom-shell --abi=48"
   },
   "author": "Bernard",
   "license": "ISC",
@@ -27,9 +27,11 @@
     "klaw": "^3.0.0",
     "locate-path": "^3.0.0",
     "lodash": "^4.17.11",
+    "n-ocr": "^0.1.4",
     "ng-ocr": "^1.6.1",
     "nocr": "^1.2.0",
     "node-tesseract": "^0.2.7",
+    "ocr-space-api": "^1.0.1",
     "optimist": "^0.6.1",
     "pcm": "^1.0.3",
     "pdf-image": "^2.0.0",

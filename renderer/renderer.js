@@ -383,6 +383,7 @@ function readFolder(){
                         //console.log(base64)
                         writePNG(saveimgpath,base64,currentPageNum).then(
                             
+                            
                             /*
                             function(){
                                 var savedimgpath = 'temp/png/'+currentPageNum+'.png'
@@ -394,12 +395,57 @@ function readFolder(){
                                 })
                             }
                             */
-                            function(pageNum){
+                           function(pageNum){
+                            
+                            console.log(Math.round(numerator/numpages)*100+"% "+ (numerator==numpages))
+
                                 PNGtoJPEG(pageNum).then(function(pageNow){
-                                    var readFrom = __dirname+'/./../temp/jpeg/'+pageNow+'.jpeg'
+                                    var readFrom = __dirname+'/./../temp/png/'+pageNow+'.png'
                                     
                                     //var readFrom = '/Users/bernardahn/Desktop/temp/jpeg/'+pageNow+'.jpeg'
-                                    
+
+                                    var ocrSpaceApi = require('ocr-space-api')
+                                    var options = {
+                                        apikey : '3a73d43a9888957',language:'kor',imageFormat:'image/png'
+                                    }
+                                    ocrSpaceApi.parseImageFromLocalFile(readFrom,options)
+                                    .then(function(parsedResult){
+                                        var text = parsedResult.parsedText
+                                        
+                                        var newText = text.replace(/(\r\n\t|\n|\r\t|\t|\f|;|\|\/|<|>|'|'|:|_|]'+'|'*'|ㅠ|ㅎ|ㅋ)/gm,"").replace(/\s\s+/g," ").replace(/[\/|\\]/g,"");
+                                        console.log(newText)
+                                        fs.writeFile(path.join(__dirname,'/../','temp/newtxt/'+pageNow+'.txt'),newText,function(err,data){
+                                            if(err){
+                                                console.error(error)
+                                            }
+                                            else{
+                                                numerator+=1;
+                                                console.log(numerator + " / " +numpages)
+                                                if(numerator==numpages){
+                                                    var files= fs.readdirSync(path.join(__dirname,'/../','temp/newtxt/'))
+                                                    files = files.sort(sortNumber)
+                                                    var text = ""
+                                                    for (var i = 0; i<=files.length; i++){
+                                                        if(files[i].split('.')[1]=='txt'){
+                                                            text +=" "+fs.readFileSync(path.join(__dirname,'/../','temp/txt/'+i+'.txt'),'utf8')
+                                                        }
+                                                    }
+                                                    fs.writeFile(path.join(__dirname,'/../','temp/newtxt/alltext.txt'),text,function(err,data){
+                                                     if(err){
+                                                         console.error(error)
+                                                     }
+                                                     else(
+                                                         console.log('alltext.txt is ready')
+                                                     )
+                                                 })
+                                                 }
+                                            }
+                                        })
+                                        
+                                        
+                                    })
+
+                                    /*
                                     var serverProc = require('child_process').fork(
                                     //require.resolve('./../testTesseract.js'),[readFrom,'KOR',pageNow])
                                     require.resolve('./../js/tesseract.js'),[readFrom,'KOR',pageNow])
@@ -407,6 +453,7 @@ function readFolder(){
                                     //require.resolve('/Users/bernardahn/Desktop/development/software/webapp/reader/js/tesseract.js'),[readFrom,'ENG',pageNow])
                                     serverProc.on('exit', (code, sig) => {
                                         // finishing
+                                    
                                         console.log('exiting '+pageNow)
                                         var text = fs.readFileSync(path.join(__dirname,'/../','temp/txt/'+currentPage+'.txt'),'utf8')
                                         var newText = text.replace(/(\r\n\t|\n|\r\t|\t|\f|;|\|\/|<|>|'|'|:|_|]'+'|'*'|ㅠ|ㅎ|ㅋ)/gm,"").replace(/\s\s+/g," ").replace(/[\/|\\]/g,"");
@@ -443,6 +490,7 @@ function readFolder(){
                                         console.error(error)
                                         // error handling
                                     })
+                                    */
                                     
                                    /*
                                     var spawn =require('child_process').spawn
@@ -580,8 +628,6 @@ function readFolder(){
                                 readit(currentPage+1)
                             }
                             else{
-
-                                console.log(text)
                                 scroller.innerHTML = text;
                                 scroller.start()
                             }
