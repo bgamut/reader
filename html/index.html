@@ -16,9 +16,17 @@
             font-family: "Roboto";
             src: url("./../webfonts/Roboto/Roboto-Bold.ttf");
         }
+        @font-face{
+        font-family: "Lucida Sans Typewriter Regular";
+        src: url("./../webfonts/Lucida Sans Typewriter Regular.ttf");
+      }
         body{
             -webkit-app-region:drag;
+            margin:0px;
+            padding:0px;
             overflow-y:hidden;
+            
+            overflow-x:hidden;
         }
         #scroller {
             display:table-cell;
@@ -41,14 +49,80 @@
             */
         }
 
-        #open{
+        
+        #log-container {
+            position:relative;
+            display:none;
             width:100%;
-            height:100%;
-            margin: 30px auto;
-            display: block;
+            height:98vh;
+            overflow:auto; 
+            top:1vh;
+            bottom:1vh;
+        }
+        #log{
+            display:inline-block;
+            word-wrap:break-word;
+            font-family:"Lucida Sans Typewriter Regular";
+            width:100%;
+            height:50vh;
+            font-size:10px;
+            margin:4px;
+        }
+
+        .log-warn{color:rgb(215,186,98)}
+        .log-error{color:rgb(208, 0, 0)}
+        .log-info{color:rgb(156,220,254)}
+        .log-log{color:rgb(106, 153, 85)}
+        #button-container{
+            margin:0px;
+            
+            padding:0px;
+            
+            position:relative;
+            
+            display: table;
+            width:100vw;
+            height:100vh;
             -webkit-app-region: no-drag;
+            /*
+                background: lightblue;
+            */
+        }
+        #button-wrapper {
+            
+            position:absolute;
+            top:38vh; 
+            bottom:38vh;
+            left:38vw;
+            right:38vw;
+            /*
+            padding:30vw,30vh;
+            transform:translate(38vw,38vh);
+            */
+            
+            
+            /*
+            background: lightgreen;     
+            width:61%;
+            display: table-cell;
+            vertical-align: middle;
+           
+            overflow:auto;
+            */
+        }
+        #open{
+            padding:5px;
+            width:100%;
+            padding: 0;
+            display: block;
             vertical-align: middle;
         }
+        hr {
+            border: none;
+            height: 0.5px;
+            background-color: rgb(92,92,92); /* Modern Browsers */
+        }
+        
 </style>
     <!--
     <script src="http://mozilla.github.io/pdf.js/build/pdf.js"></script>
@@ -59,7 +133,14 @@
     
 </head>
 <body>
-<button id='open' >open pdf file</button>
+<div id='button-container'>    
+    <div id='button-wrapper'>
+        <button id='open' >open pdf file</button>
+    </div>
+</div>
+<div id='log-container'>
+    <span id='log'></span>
+</div>
 <div class="container-fluid">
     
     <marquee id=scroller scrollamount=35 ></marquee>
@@ -117,10 +198,10 @@
         */
         var button = document.getElementById('open')
         button.onclick=()=>{
-            element.style.display='block'
+            //element.style.display='block'
             //readFolder()
             document.getElementById('pdfFilePicker').click();
-            button.style.display='none'
+            //button.style.display='none'
         }
         /*
         document.body.onclick=function(){

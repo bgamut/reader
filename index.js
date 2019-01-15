@@ -10,9 +10,10 @@ PDFParser = require('pdf2json')
 /*
 require('electron-reload')(__dirname);
 */
+
 app.on('ready', () => {
     'use strict';
-    const window = new BrowserWindow({frame:false,width: 375, height: 78,resizeable:false});
+    const window = new BrowserWindow({frame:true,width: 375, height: 208,resizeable:false});
     window.webPreference = {
         webSecurity: false
     }

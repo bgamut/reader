@@ -23,7 +23,11 @@ var pdf = require('Pdf');
 var PDFParser = require('pdf2json');
 var PdfReader = require('PdfReader').PdfReader
 */
-
+const { warn } = console;
+    console.warn = (...args) => {
+      /^%cElectron Security Warning/.test(args[0])
+        || Reflect.apply(warn, console, args);
+    };
 /*
 function readFolder(pth, backBtn) {
     if (backBtn) {
@@ -100,6 +104,49 @@ function openFile(path) {
     })
 }
 */
+
+
+function rewireLoggingToElement(eleLocator, eleOverflowLocator, autoScroll) {
+    fixLoggingFunc('log');
+    fixLoggingFunc('debug');
+    fixLoggingFunc('warn');
+    fixLoggingFunc('error');
+    fixLoggingFunc('info');
+
+    function fixLoggingFunc(name) {
+        console['old' + name] = console[name];
+        console[name] = function(...arguments) {
+            const output = produceOutput(name, arguments);
+            const eleLog = eleLocator();
+
+            if (autoScroll) {
+                const eleContainerLog = eleOverflowLocator();
+                const isScrolledToBottom = eleContainerLog.scrollHeight - eleContainerLog.clientHeight <= eleContainerLog.scrollTop + 1;
+                eleLog.innerHTML += output + "<br>";
+                if (isScrolledToBottom) {
+                    eleContainerLog.scrollTop = eleContainerLog.scrollHeight - eleContainerLog.clientHeight;
+                }
+            } else {
+                eleLog.innerHTML += output + "<br>";
+            }
+
+            console['old' + name].apply(undefined, arguments);
+        };
+    }
+
+    function produceOutput(name, arguments) {
+        return arguments.reduce((output, arg) => {
+            return output +
+                "<span class=\"log-" + (typeof arg) + " log-" + name + "\">" +
+                    (typeof arg === "object" && (JSON || {}).stringify ? JSON.stringify(arg) : arg) +
+                "</span>&nbsp;"+"<hr>";
+        }, '');
+    }
+}
+rewireLoggingToElement(
+    () => document.getElementById("log"),
+    () => document.getElementById("log-container"), true);
+
 var getPath = function(pathString){
     fs.readdir(pathString,(err,items)=>{
         for (var j in items){
@@ -179,7 +226,7 @@ function readFolder(){
 }
 */
 function sortNumber(a,b){
-    files[1].split('.')[0]-files[2].split('.')[0]
+    a.split('.')[0]-b.split('.')[0]
 }
 function readFolder(){
     
@@ -193,7 +240,13 @@ function readFolder(){
         var basename = path.basename(parentDir)
         var saveimgpath = ''
         //console.log(filepath)
+        console.log(filepath)
         if(filepath!==undefined){
+            var buttonContainer = document.getElementById('button-container')
+            buttonContainer.style.display='none'
+            document.body.setAttribute('style','background-color:rgb(30,30,30);')
+            document.getElementById('log-container').setAttribute('style','display:block')
+            window.scrollTo(0,document.body.scrollHeight);
             //pdfjsLib.GlobalWorkerOptions.workerSrc ='http://mozilla.github.io/pdf.js/build/pdf.worker.js';
             pdfjsLib.GlobalWorkerOptions.workerSrc ='./../js/pdfjs/build/pdf.worker.js';
             var rawData = new Uint8Array(fs.readFileSync(filepath))
@@ -397,13 +450,13 @@ function readFolder(){
                             */
                            function(pageNum){
                             
-                            console.log(Math.round(numerator/numpages)*100+"% "+ (numerator==numpages))
+                            
 
                                 PNGtoJPEG(pageNum).then(function(pageNow){
                                     var readFrom = __dirname+'/./../temp/png/'+pageNow+'.png'
                                     
                                     //var readFrom = '/Users/bernardahn/Desktop/temp/jpeg/'+pageNow+'.jpeg'
-
+                                    /*
                                     var ocrSpaceApi = require('ocr-space-api')
                                     var options = {
                                         apikey : '3a73d43a9888957',language:'kor',imageFormat:'image/png'
@@ -444,8 +497,8 @@ function readFolder(){
                                         
                                         
                                     })
-
-                                    /*
+                                    */
+                                    var paddedNum = function(number){return "0000".substring((number+"").length,4)+number}
                                     var serverProc = require('child_process').fork(
                                     //require.resolve('./../testTesseract.js'),[readFrom,'KOR',pageNow])
                                     require.resolve('./../js/tesseract.js'),[readFrom,'KOR',pageNow])
@@ -454,43 +507,47 @@ function readFolder(){
                                     serverProc.on('exit', (code, sig) => {
                                         // finishing
                                     
-                                        console.log('exiting '+pageNow)
+                                        console.log('exiting page '+pageNow)
                                         var text = fs.readFileSync(path.join(__dirname,'/../','temp/txt/'+currentPage+'.txt'),'utf8')
                                         var newText = text.replace(/(\r\n\t|\n|\r\t|\t|\f|;|\|\/|<|>|'|'|:|_|]'+'|'*'|ㅠ|ㅎ|ㅋ)/gm,"").replace(/\s\s+/g," ").replace(/[\/|\\]/g,"");
-                                        fs.writeFile(path.join(__dirname,'/../','temp/newtxt/'+currentPage+'.txt'),newText,function(err,data){
+                                        fs.writeFile(path.join(__dirname,'/../','temp/newtxt/'+paddedNum(currentPage)+'.txt'),newText,function(err,data){
                                             if(err){
                                                 console.error(error)
                                             }
-                                            else(
+                                            else{
                                                 numerator+=1
-                                            )
-                                        })
-                                        console.log(numerator + " / " +numpages)
-                                        if(numerator==numpages){
-                                           var files= fs.readdirSync(path.join(__dirname,'/../','temp/newtxt/'))
-                                           files = files.sort(sortNumber)
-                                           var text = ""
-                                           for (var i = 0; i<=files.length; i++){
-                                               if(files[i].split('.')[1]=='txt'){
-                                                   text +=" "+fs.readFileSync(path.join(__dirname,'/../','temp/txt/'+i+'.txt'),'utf8')
-                                               }
-                                           }
-                                           fs.writeFile(path.join(__dirname,'/../','temp/newtxt/alltext.txt'),text,function(err,data){
-                                            if(err){
-                                                console.error(error)
+                                                console.log(newText)
+                                                console.log(numerator + " / " +numpages)
+                                                console.log(Math.floor(numerator*100/numpages)+"% "+ (numerator==numpages))
+                                                if(numerator==numpages){
+                                                    var files= fs.readdirSync(path.join(__dirname,'/../','temp/newtxt/'))
+                                                    //files = files.sort(sortNumber)
+                                                    console.log(files)
+                                                    var text = ""
+                                                    for (var i = 0; i<=files.length; i++){
+                                                        if(files[i].split('.')[1]=='txt'){
+                                                            text +=" "+fs.readFileSync(path.join(__dirname,'/../','temp/txt/'+paddedNum(i)+'.txt'),'utf8')
+                                                        }
+                                                    }
+                                                    fs.writeFile(path.join(__dirname,'/../','temp/newtxt/alltext.txt'),text,function(err,data){
+                                                        if(err){
+                                                            console.error(error)
+                                                        }
+                                                        else{
+                                                            console.log('alltext.txt is ready')
+                                                        }
+                                                    })
+                                                }
                                             }
-                                            else(
-                                                console.log('alltext.txt is ready')
-                                            )
                                         })
-                                        }
-                                        console.log(newText)
+                                        
+                                        
                                     })
                                       serverProc.on('error', (error) => {
                                         console.error(error)
                                         // error handling
                                     })
-                                    */
+                                    
                                     
                                    /*
                                     var spawn =require('child_process').spawn
@@ -706,7 +763,10 @@ function readFolder(){
             )      
         }
         else{
-            document.getElementById('readFile').click()
+            console.log('yeah we canceled')
+            
+            document.getElementById('pdfFilePicker').click()
+            
         }
     }
 }
