@@ -5,6 +5,8 @@ require('electron-reload')(__dirname,{
     hardResetMethod:'exit'
   });
 */
+const ElectronTitlebarwindows = require('electron-titlebar-windows')
+
 const {app, BrowserWindow, Menu, MenuItem,ipcMain,ipcRenderer,remote, webContents} = require('electron');
 PDFParser = require('pdf2json')
 /*
@@ -13,7 +15,7 @@ require('electron-reload')(__dirname);
 
 app.on('ready', () => {
     'use strict';
-    const window = new BrowserWindow({frame:true,width: 375, height: 208,resizeable:false});
+    const window = new BrowserWindow({frame:false,width: 375, height: 208,resizeable:false});
     window.webPreference = {
         webSecurity: false
     }

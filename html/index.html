@@ -54,10 +54,9 @@
             display:none;
             width:100%;
             height:100vh;
-            overflow-y:hidden;
-            overflow-x:hidden;
             top:1vh;
             bottom:1vh;
+            -webkit-app-region: drag;
         }
         #log{
             display:inline-block;
@@ -69,9 +68,9 @@
             margin:4px;
         }
 
-        .log-warn{color:rgb(215,186,98)}
+        .log-warn{color:rgb(220,220,170)}
         .log-error{color:rgb(208, 0, 0)}
-        .log-info{color:rgb(156,220,254)}
+        .log-info{color:rgb(90,192,254)}
         .log-log{color:rgb(106, 153, 85)}
         #button-container{
             margin:0px;
@@ -129,7 +128,9 @@
 -->
     <script src='./../js/pdf.js/build/pdf.js'></script>
     <script src='./../js/reimg.js'></script>
+
     <script src="./../renderer/renderer.js"></script>
+   
     
 </head>
 <body>

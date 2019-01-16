@@ -146,7 +146,7 @@ function rewireLoggingToElement(eleLocator, eleOverflowLocator, autoScroll) {
 rewireLoggingToElement(
     () => document.getElementById("log"),
     () => document.getElementById("log-container"), true);
-
+    
 var getPath = function(pathString){
     fs.readdir(pathString,(err,items)=>{
         for (var j in items){
@@ -240,13 +240,12 @@ function readFolder(){
         var basename = path.basename(parentDir)
         var saveimgpath = ''
         //console.log(filepath)
-        console.log(filepath)
+        console.log('source file : ' + filepath)
         if(filepath!==undefined){
             var buttonContainer = document.getElementById('button-container')
             buttonContainer.style.display='none'
-            document.body.setAttribute('style','background-color:rgb(30,30,30);display:block')
-            console.log('loading')
-            document.getElementById('log-container').scrollTo(0,document.getElementById('log-container').scrollHeight)
+            document.body.setAttribute('style','background-color:rgb(30,30,30);display:block;-webkit-app-region:drag;margin:0px;padding:0px;overflow-x:hidden;overflow-y:scroll;')
+            document.getElementById('log-container').style.display='block'
             //pdfjsLib.GlobalWorkerOptions.workerSrc ='http://mozilla.github.io/pdf.js/build/pdf.worker.js';
             pdfjsLib.GlobalWorkerOptions.workerSrc ='./../js/pdfjs/build/pdf.worker.js';
             var rawData = new Uint8Array(fs.readFileSync(filepath))
@@ -507,7 +506,7 @@ function readFolder(){
                                     serverProc.on('exit', (code, sig) => {
                                         // finishing
                                     
-                                        console.log('exiting page '+pageNow)
+                                        //console.log('scanned page '+pageNow)
                                         var text = fs.readFileSync(path.join(__dirname,'/../','temp/txt/'+currentPage+'.txt'),'utf8')
                                         var newText = text.replace(/(\r\n\t|\n|\r\t|\t|\f|;|\|\/|<|>|'|'|:|_|]'+'|'*'|ㅠ|ㅎ|ㅋ)/gm,"").replace(/\s\s+/g," ").replace(/[\/|\\]/g,"");
                                         fs.writeFile(path.join(__dirname,'/../','temp/newtxt/'+paddedNum(currentPage)+'.txt'),newText,function(err,data){
@@ -516,9 +515,12 @@ function readFolder(){
                                             }
                                             else{
                                                 numerator+=1
-                                                console.log(newText)
+                                                //console.log(newText)
                                                 console.log(numerator + " / " +numpages)
-                                                console.log(Math.floor(numerator*100/numpages)+"% "+ (numerator==numpages))
+                                                //console.log(Math.floor(numerator*100/numpages)+"% "+ (numerator==numpages))
+                                                
+                                                document.body.scrollTo(0,document.body.scrollHeight)
+                                                document.getElementById('log-container').scrollTo(0,document.getElementById('log-container').scrollHeight)
                                                 if(numerator==numpages){
                                                     var files= fs.readdirSync(path.join(__dirname,'/../','temp/newtxt/'))
                                                     //files = files.sort(sortNumber)
@@ -526,7 +528,7 @@ function readFolder(){
                                                     var text = ""
                                                     for (var i = 0; i<=files.length; i++){
                                                         if(files[i].split('.')[1]=='txt'){
-                                                            text +=" "+fs.readFileSync(path.join(__dirname,'/../','temp/txt/'+paddedNum(i)+'.txt'),'utf8')
+                                                            text +=" "+fs.readFileSync(path.join(__dirname,'/../','temp/newtxt/'+paddedNum(i)+'.txt'),'utf8')
                                                         }
                                                     }
                                                     fs.writeFile(path.join(__dirname,'/../','temp/newtxt/alltext.txt'),text,function(err,data){
@@ -753,7 +755,7 @@ function readFolder(){
                 
             }
             loadingTask.promise.then((pdfDocument)=>{
-                console.log(pdfDocument._pdfInfo['numPages'])
+                console.log(pdfDocument._pdfInfo['numPages'] +' total pages.')
                 numpages = pdfDocument._pdfInfo['numPages']
             })
             .then(
@@ -765,7 +767,6 @@ function readFolder(){
         else{
             console.log('yeah we canceled')
             
-            document.getElementById('pdfFilePicker').click()
             
         }
     }
