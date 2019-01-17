@@ -228,6 +228,22 @@ function readFolder(){
 function sortNumber(a,b){
     a.split('.')[0]-b.split('.')[0]
 }
+var paddedNum = function(number){return "0000".substring((number+"").length,4)+number}
+function stripZeros(oldString){
+    var numberReached=false
+    var newString = ''
+    for (var  i = 0; i<oldString.length; i++){
+        if((numberReached ==false && oldString[i]=='0')){
+            //console.log('zero')
+        }
+        else{
+            numberReached = true;
+            newString+=(oldString[i])
+        }
+        
+    }
+    return (newString)
+}
 function readFolder(){
     
     //var canvas = document.getElementById("pdf-canvas")
@@ -253,7 +269,7 @@ function readFolder(){
             var loadingTask=pdfjsLib.getDocument(rawData)
             
             var scroller = document.getElementById('scroller')
-            
+            /*
             function dataURItoBlob(dataURI) {
                 // convert base64/URLEncoded data component to raw binary data held in a string
                 var byteString;
@@ -304,7 +320,7 @@ function readFolder(){
                 }
                 fileReader.readAsArrayBuffer(blob)
                 */
-               
+               /*
                var getblob =(blob)=>{
                    return new Promise(
                        (resolve, reject) => {
@@ -329,6 +345,7 @@ function readFolder(){
 
 
             }
+            */
             /*
             function blobToFile(theBlob, fileName){
                 //A Blob() is almost a File() - it's just missing the two properties below which we will add
@@ -340,7 +357,7 @@ function readFolder(){
            var writePNG=function (saveimgpath,base64,pagenumber){
                 return new Promise(
                     function(resolve, reject){
-                        var saveimgname = pagenumber+'.png'
+                        var saveimgname = paddedNum(pagenumber)+'.png'
                         
                         //var saveimgpath = '/Users/bernardahn/Desktop/temp/png/' +saveimgname
                         var saveimgpath = 'temp/png/'+ saveimgname
@@ -361,7 +378,7 @@ function readFolder(){
             var PNGtoJPEG = function(currentPageNum){
                 return new Promise(
                     function(resolve,reject){
-                        var savedimgpath = 'temp/png/'+currentPageNum+'.png'
+                        var savedimgpath = 'temp/png/'+paddedNum(currentPageNum)+'.png'
                         //var savedimgpath = '/Users/bernardahn/Desktop/temp/png/'+currentPageNum+'.png'
                         //console.log(savedimgpath)
                         var newimgname = currentPageNum+'.jpeg'
@@ -380,6 +397,7 @@ function readFolder(){
                     }
                 )
             }
+            /*
             var writeCustomBash=function(currentPageNum){
                 return new Promise(
                     function(resolve,reject){
@@ -400,8 +418,17 @@ function readFolder(){
                     }
                 )
             }
+            */
+            
+            
+            
             var readit = function(currentPage){
                 
+                var files= fs.readdirSync(path.join(__dirname,'/../','temp/png/'))
+                //files = files.sort(sortNumber)
+                console.log(files[files.length].split('.')[0])
+                var text = ""
+                currentPage = files.length
                 loadingTask.promise.then((pdfDocument)=>{
                 pdfDocument.getPage(currentPage).then(function(page){
                     //var canvas = document.getElementById("pdf-canvas")
@@ -423,7 +450,7 @@ function readFolder(){
                         canvasContext: canvasctx,
                         viewport:viewport
                     };
-                    saveimgpath=parentDir+'/'+currentPage+'.png'
+                    saveimgpath=parentDir+'/'+paddedNum(currentPage)+'.png'
                     
                     
                     page.render(renderContext).then(function(){
@@ -452,7 +479,7 @@ function readFolder(){
                             
 
                                 PNGtoJPEG(pageNum).then(function(pageNow){
-                                    var readFrom = __dirname+'/./../temp/png/'+pageNow+'.png'
+                                    var readFrom = __dirname+'/./../temp/png/'+paddedNum(pageNow)+'.png'
                                     
                                     //var readFrom = '/Users/bernardahn/Desktop/temp/jpeg/'+pageNow+'.jpeg'
                                     /*
@@ -497,7 +524,7 @@ function readFolder(){
                                         
                                     })
                                     */
-                                    var paddedNum = function(number){return "0000".substring((number+"").length,4)+number}
+                                    
                                     var serverProc = require('child_process').fork(
                                     //require.resolve('./../testTesseract.js'),[readFrom,'KOR',pageNow])
                                     require.resolve('./../js/tesseract.js'),[readFrom,'KOR',pageNow])
