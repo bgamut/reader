@@ -17,10 +17,11 @@ app.on('ready', () => {
     'use strict';
     //const window = new BrowserWindow({frame:true,width: 375, height: 208,resizeable:false});
     const window = new BrowserWindow({
-        width: 300,
-        height: 135,
-        frame: true,
-        resizable:false
+        width: 250,
+        height: 150,
+        frame: false,
+        resizable:true,
+        titleBarStyle: 'hidden'
       });
     window.webPreference = {
         webSecurity: false

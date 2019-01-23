@@ -17,15 +17,29 @@
             src: url("./../webfonts/Roboto/Roboto-Bold.ttf");
         }
         @font-face{
-        font-family: "Lucida Sans Typewriter Regular";
-        src: url("./../webfonts/Lucida Sans Typewriter Regular.ttf");
-      }
+            font-family: "Lucida Sans Typewriter Regular";
+            src: url("./../webfonts/Lucida Sans Typewriter Regular.ttf");
+        }
+        @font-face{
+            font-family: "Roboto Mono";
+            src: url("./../webfonts/Roboto_Mono/RobotoMono-Regular.ttf");
+        }
+        @font-face{
+            font-family: "Helvetica Neue";
+            src: url("./../webfonts/HelveticaNeue.ttf");
+        }
         body{
             -webkit-app-region:drag;
             margin:0px;
             padding:0px;
             overflow-y:hidden;
             overflow-x:hidden;
+            background-color: rgb(30,30,30);
+            -webkit-app-region:drag;
+          
+            height:100vh;
+            width:100vw;
+            
         }
         #scroller {
             display:table-cell;
@@ -119,32 +133,256 @@
         #open{
             position:relative;
             padding:5px;
-            margin:5px;
-            width:100%;
-            height:100%;
-            border-radius:10px;
+            
+            margin:8px;
+            width:auto;
+            height:auto;
+            border-radius:8px;
             display: block;
             vertical-align: middle;
             text-align:center;
-            flex-direction:row
+            flex-direction:row;
+            background-color:rgb(45,45,45);
+            color:rgb(142, 142, 142);
+        }
+        #open:focus{
+            position:relative;
+            padding:5px;
+            margin:8px;
+            width:auto;
+            height:auto;
+            border-radius:8px;
+            display: block;
+            vertical-align: middle;
+            text-align:center;
+            flex-direction:row;
+            background-color:rgb(188,188,188);
+            color:rgb(30, 30, 30);
+            outline: 0;
+        }
+        #open:hover{
+            position:relative;
+            padding:5px;
+            margin:8px;
+            width:auto;
+            height:auto;
+            border-radius:8px;
+            display: block;
+            vertical-align: middle;
+            text-align:center;
+            flex-direction:row;
+            background-color:rgb(188,188,188);
+            color:rgb(30, 30, 30);
+        }
+        #open:active{
+            position:relative;
+            padding:5px;
+            margin:8px;
+            
+            width:auto;
+            height:auto;
+            border-radius:8px;
+            display: block;
+            vertical-align: middle;
+            text-align:center;
+            flex-direction:row;
+            background-color:rgb(45,45,45);
+            color:rgb(142, 142, 142);
         }
         #select{
+            position:relative;
+            padding:5px;
+            
+            margin:8px;
+            
+            width:auto;
+            height:auto;
+            border-radius:8px;
+            display: block;
+            vertical-align: middle;
+            text-align:center;
+            flex-direction:row;
+            outline: 0;
+            background-color:rgb(45,45,45);
+            color:rgb(142, 142, 142);
+        }
+        #select:focus{
+            position:relative;
+            padding:5px;
+            
+            margin:8px;
+            
+            width:auto;
+            height:auto;
+            border-radius:8px;
+            display: block;
+            vertical-align: middle;
+            text-align:center;
+            flex-direction:row;
+            outline: 0;
+        }
+        
+        option{
             position:relative;
             padding:5px;
             margin:5px;
             width:100%;
             height:100%;
-            border-radius:10px;
+            border-radius:7px;
             display: block;
             vertical-align: middle;
             text-align:center;
-            flex-direction:row
+            flex-direction:row;
+            outline: 0;
+            background-color:rgb(45,45,45);
+            color:rgb(45,45,45);
         }
-
         hr {
             border: none;
             height: 0.5px;
             background-color: rgb(92,92,92); /* Modern Browsers */
+        }
+        #titleBar{
+            
+            font-family: "Helvetica Neue";
+            background-color:#333333;
+            width:100vw;
+            height:22px;
+            -webkit-app-region:drag;
+        }
+        #title{
+            
+            font-family: "Helvetica Neue";
+            
+            font-size:13px;
+            text-align: center;
+            color:rgb(142, 142, 142);
+            width:100vw;
+            height:18px;
+            transform:translateY(4px);
+            -webkit-app-region:drag;
+            -moz-user-select: -moz-none;
+            -khtml-user-select: none;
+            -webkit-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+        #whole-screen{
+            width:100vw; 
+            height:100vh;
+            overflow: hidden;
+            display: grid;
+            position:absolute;
+        }
+        #img-container{
+ 
+            position:relative;
+            height:100vh;
+            width:50vw;
+            float:left;
+            display:flex;
+            display:grid;
+            display:table;
+            flex-direction:column;
+            opacity:1.0;
+            z-index:0;
+            
+            grid-row:1;
+            grid-column:1;
+            box-sizing: border-box;
+            -moz-box-sizing: border-box;
+            -webkit-box-sizing: border-box;
+            border:solid 1px rgb(166, 166, 166);
+            
+        }
+
+        #type-writer-area{
+            position:relative;
+            height:100vh;
+            width:50vw;
+            float:right;
+            display:flex;
+            caret-color:rgb(140, 140, 140);
+            flex-direction:column;
+            opacity:1.0;
+            z-index:0;
+            
+            grid-row:1;
+            grid-column:2;
+
+            display:table;
+        }
+        #text-input{
+            font-family:'Roboto Mono';
+            box-sizing: border-box;
+            -moz-box-sizing: border-box;
+            -webkit-box-sizing: border-box;
+            border:solid 1px rgb(140, 140, 140);
+            background-color:rgb(30, 30, 30);
+            color:rgb(142,142,142);
+            position:absolute;
+            /*
+            background-color:transparent;
+            */
+            height:100%;
+            width:100%;
+            opacity:1.0;
+            z-index:1;
+        }
+        #text-input::selection{
+            background-color:rgb(166, 166, 166);
+            color:rgb(245, 245, 245);
+
+        }
+        #text-input:focus{
+            outline: 0;
+        }
+        .place-holders{
+            
+            box-sizing: border-box;
+            -moz-box-sizing: border-box;
+            -webkit-box-sizing: border-box;
+            border:solid 2px white;
+            
+            background-size: 100% 100%;
+            position:absolute;
+            background-color:transparent;
+            height:100%;
+            width:100%;
+            opacity:1.0;
+            z-index:-1;
+            
+            
+        }
+        .overlay-text{
+            font-family:'Roboto Mono';
+            position:absolute;
+            opacity:1;
+            border-style:solid;
+            border-width:1px;
+            border-radius:5px;
+            border:red;
+            
+            height:100%;
+            width:100%;
+            text-align:center;
+            z-index:0;
+           
+            display:table-cell;
+            vertical-align:middle;
+            display:inline-block;
+
+            overflow:auto;
+            margin:auto;
+            top:0;
+            left:0;
+            bottom:0;
+            right:0;
+        }
+        #container{
+            height:100%;
+            width:100%;
+            display:none;
         }
         
 </style>
@@ -161,7 +399,20 @@
 <body>
 <!--
     <TitleBar title="Project Name"/>
--->    
+-->  
+<div id = 'titleBar'><div id = 'title'>reader</div></div>
+<div id = 'container'>
+    <div class ='row'id='whole-screen'>
+        <div class ='col-xs-6' id='img-container'>
+            <div class='overlay-text' id='left'></div>
+            <div class ='place-holders' id = 'place-holder1'></div>
+        </div>
+        <div class ='col-xs-6' id='type-writer-area'>
+            <div class ='place-holders'id = 'place-holder2'></div>
+            <textarea id='text-input'type='text' spellcheck="false"></textarea>
+        </div>
+    </div>
+</div>
 <div id='button-container'>    
     <div id='button-wrapper'>
             <select id = 'select'>

@@ -99,8 +99,83 @@ function stripZeros(oldString){
     }
     return (newString)
 }
-function readFolder(){
+function polarToCartesian(centerX, centerY, radius, angleInDegrees) {
+    var angleInRadians = (angleInDegrees-90) * Math.PI / 180.0;
+    return {
+        x: centerX + (radius * Math.cos(angleInRadians)),
+        y: centerY + (radius * Math.sin(angleInRadians))
+    };
+}
 
+function describeArc(x, y, radius, startAngle, endAngle){
+    var start = polarToCartesian(x, y, radius, endAngle);
+    var end = polarToCartesian(x, y, radius, startAngle);
+    var largeArcFlag = endAngle - startAngle <= 180 ? "0" : "1";
+    var d = [
+        "M", start.x, start.y, 
+        "A", radius, radius, 0, largeArcFlag, 0, end.x, end.y
+    ].join(" ");
+    return d;       
+}
+function circularProgressBar(id){
+    this.ID=id
+    this.arcID="arc"+this.ID
+    this.textID="svgtext"+this.ID
+    this.width=0
+    this.height=0
+    this.centerX=0
+    this.centerY=0
+    this.radius=0
+    this.startAngle=0
+    this.endAngle=0
+    this.color='rgb(140,140,140)'
+    this.pointer=null
+    
+    this.draw=function(){
+        var textElement=document.getElementById(this.textID)
+        textElement.setAttribute('x',this.centerX+this.radius*0.5)
+        textElement.setAttribute('y',this.centerY+(textElement.getBBox().height/2.75))
+        textElement.innerHTML=((this.endAngle-this.startAngle)*100/359).toFixed(2)+"%"
+        document.getElementById(this.arcID).setAttribute("d", describeArc(this.centerX, this.centerY, this.radius, this.startAngle, this.endAngle));
+    }
+    this.refresh=function(){
+        
+        this.width=this.pointer.offsetWidth
+        this.height=this.pointer.offsetHeight
+        this.centerX=this.width/2
+        this.centerY=this.height/2
+        this.radius=this.centerX<this.centerY?this.centerX/2:this.centerY/2;
+        document.getElementById(this.textID).style.fontSize=this.radius/4+'px'
+        this.draw()
+    }
+    this.appendArc=function(parent){
+        var htmlString="<div id='p"+this.ID+"'><svg id='svg"+this.ID+"'><text id=svgtext"+this.ID+">0%</text><path id=arc"+this.ID+" fill='none' stroke='"+this.color+"'stroke-width='15'/></svg></div>"
+        parent.innerHTML = htmlString
+        this.pointer = document.getElementById("p"+this.ID)
+        this.pointer.style.width="100%"
+        this.pointer.style.height="100%"
+        this.pointer.children[0].style.width="100%"
+        this.pointer.children[0].style.height="100%"
+        document.getElementById(this.textID).style.fontFamily='Roboto Mono'
+        document.getElementById(this.textID).style.fill=this.color
+        document.getElementById(this.textID).style.textAnchor='end'
+        document.getElementById(this.arcID).style.strokeLinecap='round'
+        this.refresh()  
+    }
+    this.update=function(stepFraction){
+        var temp = this.endAngle+=359*stepFraction
+        if(temp<360){
+            this.endAngle=temp;
+        }
+        else{
+            this.endAngle=0;
+        }
+        this.draw()
+    }
+}
+function readFolder(){
+    var p =new circularProgressBar(1)
+    p.appendArc(document.body)
     document.getElementById('pdfFilePicker').addEventListener('change',readFile,false);
     function readFile(evt){
         var files = evt.target.files;
@@ -110,12 +185,17 @@ function readFolder(){
         var saveimgpath = ''
         console.log('source file : ' + filepath)
         if(filepath!==undefined){
+            var win = remote.getCurrentWindow()
+            win.setSize(400,400)
+            
             var buttonContainer = document.getElementById('button-container')
             buttonContainer.style.display='none'
             var select = document.getElementById('select')
             select.style.display='none'
             document.body.setAttribute('style','background-color:rgb(30,30,30);display:block;-webkit-app-region:drag;margin:0px;padding:0px;overflow-x:hidden;overflow-y:scroll;')
-            document.getElementById('log-container').style.display='block'
+            //document.getElementById('log-container').style.display='block'
+            p.refresh()
+            p.draw()
             pdfjsLib.GlobalWorkerOptions.workerSrc ='./../js/pdfjs/build/pdf.worker.js';
             var rawData = new Uint8Array(fs.readFileSync(filepath))
             var loadingTask=pdfjsLib.getDocument(rawData)
@@ -156,21 +236,27 @@ function readFolder(){
                     }
                 )
             }
-  
+            var txtList;
             var readit = function(currentPage){
                 if(previousDevelopmentCheck==false){
-                    var pngFiles= fs.readdirSync(path.join(__dirname,'/../','temp/png/'))
                     var txtFiles=fs.readdirSync(path.join(__dirname,'/../','temp/newtxt'))
-                    /*
-                    if((pngFiles.length<2)){
-                        var fileName = pngFiles[files.length-1]
-                        console.log(fileName)
-                        currentPage = pngFiles.length-1
-                        console.log('continuing from previous file generation from page number '+currentPage+'.')  
-                    }
-                    */
+                    txtList = txtFiles.map(function(txtFile){
+                        if(txtFile.split('.')[0]!==""){
+                            return stripZeros(txtFile.split('.')[0])
+                        }
+                    })
                     previousDevelopmentCheck=true
                 }
+                var checkpoint = false;
+                while(checkpoint == false){
+                    if(txtList.includes(String(currentPage))){
+                        currentPage+=1;
+                    }
+                    else{
+                        checkpoint=true;
+                    }
+                }
+                
                 var text = ""
                 
                 loadingTask.promise.then((pdfDocument)=>{
@@ -214,10 +300,230 @@ function readFolder(){
                                                     }
                                                     else{
                                                         numerator+=1
+                                                        p.update(1/numpages)
+                                                        p.refresh()
+                                                        p.draw()
                                                         console.log(numerator + " / " +numpages)
                                                         document.body.scrollTo(0,document.body.scrollHeight)
                                                         document.getElementById('log-container').scrollTo(0,document.getElementById('log-container').scrollHeight)
                                                         if(numerator==numpages){
+                                                            p.pointer.style.display='none'
+                                                            document.getElementById('container').style.display='block'
+                                                            win.setSize(800,365)
+                                                            win.setResizable=true;
+                                                            var currentPageFixing=1;
+                                                            var img=document.getElementById('place-holder1')
+                                                            var imgURL 
+                                                            img.style.backgroundImage='url('+imgURL+')'
+                                                            img.style.filter='invert(88%)';
+                                                            var textInput = document.getElementById('text-input')
+                                                            var imgContainer = document.getElementById('img-container')
+                                                            var typeWriterArea = document.getElementById('type-writer-area')
+                                                            var left = document.getElementById('left')
+                                                            var placeHolders = document.getElementsByClassName('place-holders')
+                                                            function fillScreen(){
+                                                                var imgURL = './temp/jpeg/'+paddedNum(currentPageFixing)+'.jpeg'
+                                                                img.style.backgroundImage='url('+imgURL+')'
+                                                                img.style.filter='invert(88%)';
+                                                                textInput.value = fs.readFileSync(path.join(__dirname,'/../','temp/newtxt/'+paddedNum(currentPageFixing)+'.txt'),'utf8')
+                                                            }
+                                                            fillScreen()
+                                                            function sizeElements(){
+                                                                var widthPadding = placeHolders[1].offsetWidth/13
+                                                                var heightPadding = placeHolders[1].offsetHeight/16
+                                                                var textSize = widthPadding*3/8
+                                                                var lineHeight =heightPadding*8/13
+                                                                textInput.style.padding= heightPadding +'px '+widthPadding+'px '+ heightPadding +'px '+widthPadding+'px '
+                                                                textInput.style.fontSize = textSize +'px'
+                                                                textInput.style.lineHeight = lineHeight + 'px'
+                                                                for (var k = 0; k<placeHolders.length; k++){
+                                                                var placeHolder = placeHolders[k]
+                                                                var mouseX, mouseY;
+                                                        
+                                                                }
+                                                            }
+                                                        
+                                                            sizeElements()
+                                                            function flip(next){
+                                                                if(next ==true){
+                                                                    if(currentPageFixing<numpages){
+                                                                        currentPageFixing=currentPageFixing+1
+                                                                    }
+                                                                    else{
+                                                                        currentPageFixing=0
+                                                                    }
+                                                                }
+                                                                else{
+                                                                    if(currentPageFixing>1){
+                                                                        currentPageFixing=currentPageFixing-1
+                                                                    }
+                                                                    else{
+                                                                        currentPageFixing=numpages
+                                                                    }
+                                                                }
+                                                                fillScreen()
+                                                                
+                                                            }
+                                                            window.addEventListener('resize',function(){
+                                                                sizeElements();
+                                                            })
+                                                            
+                                                            var currentWordListIndex=0
+                                                            
+                                                            textInput.addEventListener('keydown',function(e){
+                                                                var rawTextString = textInput.value
+                                                                var wordList=textInput.value.split(/\s+/)
+                                                                var indexList = []
+                                                                for (var i =0; i<wordList.length; i++){
+                                                                    indexList.push([rawTextString.indexOf(wordList[i]),rawTextString.indexOf(wordList[i])+wordList[i].length])
+                                                                }
+                                                                var cursorIndex=textInput.selectionStart
+                                                                function binarySearch(array, number) {
+                                                                    var min= 0;
+                                                                    var max = array.length - 1;
+                                                                    while (min <= max) {
+                                                                        var index = (max + min) >> 1;
+                                                                        var cmp = number - array[index][0];
+                                                                        if (cmp > 0) {
+                                                                            min = index + 1;
+                                                                        } else if(cmp < 0) {
+                                                                            max = index - 1;
+                                                                        } else {
+                                                                            return [index-1, index];
+                                                                        }
+                                                                    }
+                                                                    return [min, max];
+                                                                }
+                                                                var endIndex = wordList.length
+                                                                
+                                                                if(e.shiftKey){
+                                                                    if(e.keyCode==9){
+                                                                        e.preventDefault();
+                                                                        var currentWordListIndex=binarySearch(indexList,cursorIndex)[0]
+                                                                        
+                                                                        if (currentWordListIndex==-1 ){
+                                                                            currentWordListIndex=endIndex-1
+                                                                        }
+                                                                        textInput.setSelectionRange(indexList[currentWordListIndex][0],indexList[currentWordListIndex][1])
+                                                                        currentWordListIndex-=1
+                                                                    }
+                                                                    else if(e.keyCode==13){
+                                                                        e.preventDefault();
+                                                                        flip(false)
+                                                                        console.log('prev page load function goes here')
+                                                                    }
+                                                                    else if(e.keyCode==39){
+                                                                        e.preventDefault();
+                                                                        flip(true)
+                                                                        console.log('next page load function goes here')
+                                                                    }
+                                                                    else if(e.keyCode==37){
+                                                                        e.preventDefault();
+                                                                        flip(false)
+                                                                        console.log('previous page load function goes here')
+                                                                    }
+                                                                }
+                                                                else if(e.metaKey){
+                                                                    if(e.keyCode==9){
+                                                                        e.preventDefault();
+                                                                        var currentWordListIndex=binarySearch(indexList,cursorIndex)[0]
+                                                                        
+                                                                        if (currentWordListIndex==-1){
+                                                                            currentWordListIndex=endIndex-1
+                                                                        }
+                                                                        textInput.setSelectionRange(indexList[currentWordListIndex][0],indexList[currentWordListIndex][1])
+                                                                        currentWordListIndex-=1
+                                                                    }
+                                                                    else if(e.keyCode==13){
+                                                                        e.preventDefault();
+                                                                        flip(false)
+                                                                        console.log('prev page load function goes here')
+                                                                    }
+                                                                    else if(e.keyCode==39){
+                                                                        e.preventDefault();
+                                                                        flip(true)
+                                                                        console.log('next page load function goes here')
+                                                                    }
+                                                                    else if(e.keyCode==37){
+                                                                        e.preventDefault();
+                                                                        flip(false)
+                                                                        console.log('previous page load function goes here')
+                                                                    }
+                                                                }
+                                                                else if(e.altKey){
+                                                                    if(e.keyCode==9){
+                                                                        e.preventDefault();
+                                                                        var currentWordListIndex=binarySearch(indexList,cursorIndex)[0]
+                                                                        
+                                                                        if (currentWordListIndex==-1){
+                                                                            currentWordListIndex=endIndex-1
+                                                                        }
+                                                                        textInput.setSelectionRange(indexList[currentWordListIndex][0],indexList[currentWordListIndex][1])
+                                                                        currentWordListIndex-=1
+                                                                    }
+                                                                    else if(e.keyCode==13){
+                                                                        e.preventDefault();
+                                                                        flip(false)
+                                                                        console.log('prev page load function goes here')
+                                                                    }
+                                                                    else if(e.keyCode==39){
+                                                                        e.preventDefault();
+                                                                        flip(true)
+                                                                        console.log('next page load function goes here')
+                                                                    }
+                                                                    else if(e.keyCode==37){
+                                                                        e.preventDefault();
+                                                                        flip(false)
+                                                                        console.log('previous page load function goes here')
+                                                                    }
+                                                                }
+                                                                else if(e.ctrlKey){
+                                                                    if(e.keyCode==9){
+                                                                        e.preventDefault();
+                                                                        var currentWordListIndex=binarySearch(indexList,cursorIndex)[0]
+                                                                        
+                                                                        if (currentWordListIndex==-1){
+                                                                            currentWordListIndex=endIndex-1
+                                                                        }
+                                                                        textInput.setSelectionRange(indexList[currentWordListIndex][0],indexList[currentWordListIndex][1])
+                                                                        currentWordListIndex-=1
+                                                                    }
+                                                                    else if(e.keyCode==13){
+                                                                        e.preventDefault();
+                                                                        flip(false)
+                                                                        console.log('prev page load function goes here')
+                                                                    }
+                                                                    else if(e.keyCode==39){
+                                                                        e.preventDefault();
+                                                                        flip(true)
+                                                                        console.log('next page load function goes here')
+                                                                    }
+                                                                    else if(e.keyCode==37){
+                                                                        e.preventDefault();
+                                                                        flip(false)
+                                                                        console.log('previous page load function goes here')
+                                                                    }
+                                                                }
+                                                                else{
+                                                                    if(e.keyCode==9){
+                                                                        e.preventDefault();
+                                                                        var currentWordListIndex=binarySearch(indexList,cursorIndex)[1]
+                                                                        currentWordListIndex+=1; 
+                                                                        if(!(currentWordListIndex<endIndex)){
+                                                                                currentWordListIndex=0;
+                                                                            }
+                                                                        textInput.setSelectionRange(indexList[currentWordListIndex][0],indexList[currentWordListIndex][1])
+                                                                          
+                                                                    }
+                                                                    else if(e.keyCode==13){
+                                                                        e.preventDefault();
+                                                                        flip(true)
+                                                                        console.log('next page load function goes here')
+                                                                    }
+                                                                }
+                                                            })
+                                                           
+                                                            /*
                                                             var files= fs.readdirSync(path.join(__dirname,'/../','temp/newtxt/'))
                                                             console.log(files)
                                                             var text = ""
@@ -234,6 +540,7 @@ function readFolder(){
                                                                     console.log('alltext.txt is ready')
                                                                 }
                                                             })
+                                                            */
                                                         }
                                                     }
                                                 })
