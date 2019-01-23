@@ -15,7 +15,13 @@ require('electron-reload')(__dirname);
 
 app.on('ready', () => {
     'use strict';
-    const window = new BrowserWindow({frame:true,width: 375, height: 208,resizeable:false});
+    //const window = new BrowserWindow({frame:true,width: 375, height: 208,resizeable:false});
+    const window = new BrowserWindow({
+        width: 300,
+        height: 135,
+        frame: true,
+        resizable:false
+      });
     window.webPreference = {
         webSecurity: false
     }

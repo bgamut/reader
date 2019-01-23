@@ -16,6 +16,9 @@ const { warn } = console;
     };
 var previousDevelopmentCheck = false;
 var pagesDonePreviously = 0;
+/*
+var {TitleBar} =require('frameless-titlebar')
+*/
 
 function rewireLoggingToElement(eleLocator, eleOverflowLocator, autoScroll) {
     fixLoggingFunc('log');
@@ -157,7 +160,7 @@ function readFolder(){
             var readit = function(currentPage){
                 if(previousDevelopmentCheck==false){
                     var pngFiles= fs.readdirSync(path.join(__dirname,'/../','temp/png/'))
-                    var txtFiles=fs.readdirSync(path.join(__dirname,'/../','temp/newText'))
+                    var txtFiles=fs.readdirSync(path.join(__dirname,'/../','temp/newtxt'))
                     /*
                     if((pngFiles.length<2)){
                         var fileName = pngFiles[files.length-1]
